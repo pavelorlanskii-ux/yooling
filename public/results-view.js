@@ -12,6 +12,33 @@ function line(document, label, value) {
   return node(document, 'p', { text: `${label}: ${value ?? ''}` });
 }
 
+function translateResultsMessage(text) {
+  if (!text) return text;
+  return text
+    .replace('详细结果按题组列出，汇总位于页面末尾。', 'Detailed results are listed by group. The summary is at the bottom of the page.')
+    .replace('已放弃当前题组；它未计入本次结果。详细结果如下。', 'The current group was abandoned and was not included in the results. Detailed results are below.')
+    .replace('正在自动保存报告……', 'Saving report automatically…')
+    .replace('报告已自动保存到：', 'Report saved automatically to: ')
+    .replace('自动保存报告失败：', 'Failed to save report automatically: ')
+    .replace('。请确认本地服务仍在运行且“练题报告”文件夹可写。', '. Make sure the local service is still running and the report folder is writable.');
+}
+
+function observeResultsMessage(document) {
+  const target = document.getElementById('results-message');
+  if (!target || target.dataset.englishResultsObserver === 'true') return;
+
+  const apply = () => {
+    const translated = translateResultsMessage(target.textContent);
+    if (translated !== target.textContent) target.textContent = translated;
+  };
+
+  target.dataset.englishResultsObserver = 'true';
+  apply();
+  if (typeof MutationObserver === 'function') {
+    new MutationObserver(apply).observe(target, { childList: true, characterData: true, subtree: true });
+  }
+}
+
 function objectiveResult(document, article, item, displayAnswer = (value) => value) {
   article.append(
     line(document, 'Your answer', displayAnswer(item.userAnswer)),
@@ -108,6 +135,7 @@ function appendGroupBody(document, article, detail) {
 }
 
 export function renderResults(document, detailsRoot, summaryRoot, result) {
+  observeResultsMessage(document);
   detailsRoot.replaceChildren();
   result.details.forEach((detail, index) => {
     const article = node(document, 'article', { className: 'result-group' });
