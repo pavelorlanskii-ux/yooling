@@ -1,0 +1,6 @@
+.section-tab > span,
+#selected-section-heading > span,
+.task-card-section,
+.task-card-name {
+  display: none !important;
+}
