@@ -1,81 +1,81 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="ru">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>TOEFull | 2026 TOEFL iBT 练习</title>
+  <title>TOEFull | TOEFL iBT 2026</title>
   <link rel="icon" href="data:,">
   <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
   <main id="catalog-view" class="management-view">
     <header class="management-header">
-      <p class="eyebrow">本地 · 文本与音频题库 · 离线练习</p>
+      <p class="eyebrow">Локальная база текстовых и аудиозаданий · Практика</p>
       <h1>TOEFull</h1>
-      <p>选择一种题型，然后随机抽取题组或开启“定制题组”逐组勾选。当前作答只保留在本页内，刷新页面后作废。</p>
+      <p>Выберите раздел и тип задания. Можно выбрать конкретные группы или перейти в случайный режим. Текущие ответы сохраняются только на этой странице и будут потеряны после обновления.</p>
     </header>
 
-    <div id="catalog-message" class="management-message" role="status" aria-live="polite">正在读取题库……</div>
-    <section id="task-cards" class="task-picker" aria-label="题型">
-      <nav id="section-tabs" class="section-tabs" aria-label="选择考试部分"></nav>
-      <section class="subtype-panel" aria-label="选择小题型">
+    <div id="catalog-message" class="management-message" role="status" aria-live="polite">Загрузка базы заданий…</div>
+    <section id="task-cards" class="task-picker" aria-label="Тип задания">
+      <nav id="section-tabs" class="section-tabs" aria-label="Выбор раздела экзамена"></nav>
+      <section class="subtype-panel" aria-label="Выбор типа задания">
         <div id="selected-section-heading" class="section-heading"></div>
         <div id="type-cards" class="card-grid"></div>
       </section>
     </section>
 
-    <section class="setup-bar" aria-label="练习设置">
+    <section class="setup-bar" aria-label="Настройки тренировки">
       <fieldset class="source-filter">
-        <legend>题目来源</legend>
-        <label><input id="official-filter" type="checkbox" checked> 官方</label>
-        <label><input id="unofficial-filter" type="checkbox" checked> 非官方</label>
+        <legend>Источник заданий</legend>
+        <label><input id="official-filter" type="checkbox" checked> Официальные</label>
+        <label><input id="unofficial-filter" type="checkbox" checked> Неофициальные</label>
       </fieldset>
       <label class="mode-switch" for="custom-group-mode">
         <input id="custom-group-mode" type="checkbox" role="switch" checked>
         <span class="switch-track" aria-hidden="true"></span>
-        <span>定制题组</span>
+        <span>Выбор групп</span>
       </label>
       <span id="random-count-control" class="random-count-control">
-        <label for="group-count">题组数量</label>
+        <label for="group-count">Количество групп</label>
         <input id="group-count" type="number" min="1" step="1" value="1" inputmode="numeric">
       </span>
-      <button id="refresh-catalog" type="button" class="secondary">刷新题库</button>
-      <button id="view-history" type="button" class="secondary">查看全部题组记录</button>
-      <button id="reset-completion" type="button" class="secondary">重置作答记录</button>
-      <button id="start-session" type="button" class="primary" disabled>开始练习</button>
+      <button id="refresh-catalog" type="button" class="secondary">Обновить базу</button>
+      <button id="view-history" type="button" class="secondary">История</button>
+      <button id="reset-completion" type="button" class="secondary">Сбросить результаты</button>
+      <button id="start-session" type="button" class="primary" disabled>Начать тренировку</button>
     </section>
     <section id="custom-group-panel" class="custom-group-panel" aria-labelledby="custom-group-heading" hidden>
       <header class="custom-group-header">
         <div>
-          <h2 id="custom-group-heading">选择本次题组</h2>
-          <p>勾选的题组会按编号顺序进入本次练习。</p>
+          <h2 id="custom-group-heading">Выберите группы для этой тренировки</h2>
+          <p>Отмеченные группы будут добавлены в тренировку по порядку номеров.</p>
         </div>
-        <strong id="custom-selection-count">已选择 0 组</strong>
+        <strong id="custom-selection-count">Выбрано: 0</strong>
       </header>
       <div class="custom-group-columns" aria-hidden="true">
         <span></span>
-        <span>题组 ID</span>
-        <span>做过次数</span>
-        <span>上次记录</span>
-        <span>本次练习</span>
+        <span>ID группы</span>
+        <span>Попыток</span>
+        <span>Последний результат</span>
+        <span>В эту тренировку</span>
       </div>
       <div id="custom-group-list" class="custom-group-list" aria-live="polite"></div>
     </section>
-    <section id="catalog-errors" class="catalog-errors" aria-label="题库校验错误"></section>
+    <section id="catalog-errors" class="catalog-errors" aria-label="Ошибки проверки базы заданий"></section>
   </main>
 
   <main id="history-view" class="management-view history-view" hidden>
     <header class="history-header">
       <div>
-        <p class="eyebrow">本地作答记录</p>
-        <h1>全部题组</h1>
-        <p>只展示题组标签与作答统计，不展示原题或作答内容。</p>
+        <p class="eyebrow">История тренировок</p>
+        <h1>Все группы</h1>
+        <p>Здесь отображаются группы заданий и статистика попыток без самих заданий и ответов.</p>
       </div>
-      <button id="history-return" type="button" class="secondary">返回题型选择</button>
+      <button id="history-return" type="button" class="secondary">К выбору заданий</button>
     </header>
-    <section class="history-picker" aria-label="作答记录筛选">
-      <nav id="history-section-tabs" class="section-tabs history-section-tabs" aria-label="选择考试部分"></nav>
-      <nav id="history-tabs" class="history-tabs" aria-label="选择小题型"></nav>
+    <section class="history-picker" aria-label="Фильтр истории">
+      <nav id="history-section-tabs" class="section-tabs history-section-tabs" aria-label="Выбор раздела экзамена"></nav>
+      <nav id="history-tabs" class="history-tabs" aria-label="Выбор типа задания"></nav>
     </section>
     <section id="history-table" class="history-table-wrap" aria-live="polite"></section>
   </main>
@@ -108,11 +108,11 @@
       <div id="exam-message" class="exam-message" role="status" aria-live="polite"></div>
       <div id="exam-content" class="exam-content"></div>
       <footer id="question-source" class="question-source"></footer>
-      <div id="phrase-confirm-popover" class="phrase-confirm-popover" role="dialog" aria-label="确认保存陌生词块" hidden>
+      <div id="phrase-confirm-popover" class="phrase-confirm-popover" role="dialog" aria-label="Подтверждение сохранения слова или фразы" hidden>
         <strong id="phrase-confirm-preview"></strong>
         <div class="phrase-confirm-actions">
-          <button id="phrase-confirm-cancel" type="button">取消</button>
-          <button id="phrase-confirm-accept" type="button">确认保存</button>
+          <button id="phrase-confirm-cancel" type="button">Отмена</button>
+          <button id="phrase-confirm-accept" type="button">Сохранить</button>
         </div>
       </div>
       <div id="paused-overlay" class="paused-overlay" hidden>
@@ -123,14 +123,14 @@
   </main>
 
   <main id="results-view" class="management-view results-view" hidden>
-    <p class="eyebrow">本次会话已结束</p>
-    <h1>练习完成</h1>
+    <p class="eyebrow">Тренировка завершена</p>
+    <h1>Результаты</h1>
     <p id="results-message"></p>
-    <section id="result-details" class="result-details" aria-label="题组详细结果"></section>
-      <section id="result-summary" class="result-summary" aria-label="结果汇总"></section>
+    <section id="result-details" class="result-details" aria-label="Подробные результаты"></section>
+      <section id="result-summary" class="result-summary" aria-label="Итог"></section>
       <div class="result-actions">
         <button id="report-exception-results" type="button" class="secondary">Report Exception</button>
-        <button id="return-home" type="button" class="secondary">返回题型选择</button>
+        <button id="return-home" type="button" class="secondary">К выбору заданий</button>
       </div>
   </main>
 
