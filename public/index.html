@@ -3,16 +3,16 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>TOEFull | TOEFL iBT 2026</title>
-  <link rel="icon" href="data:,">
+  <title>Yooling | TOEFL Practice</title>
+  <link rel="icon" type="image/png" href="https://eimage.sendsay.ru/image/x_1758546724781206/favicon.png?v=1">
   <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
   <main id="catalog-view" class="management-view">
     <header class="management-header">
-      <p class="eyebrow">Локальная база текстовых и аудиозаданий · Практика</p>
-      <h1>TOEFull</h1>
-      <p>Выберите раздел и тип задания. Можно выбрать конкретные группы или перейти в случайный режим. Текущие ответы сохраняются только на этой странице и будут потеряны после обновления.</p>
+      <h1>Yooling</h1>
+      <p><strong>Подготовка к TOEFL iBT</strong></p>
+      <p>Выберите раздел и тип задания, затем соберите тренировку из нужных групп или запустите случайный набор.</p>
     </header>
 
     <div id="catalog-message" class="management-message" role="status" aria-live="polite">Загрузка базы заданий…</div>
@@ -236,17 +236,19 @@
         const message = root.querySelector('#catalog-message');
         if (message) {
           const text = message.textContent;
-          if (text === '正在读取题库……') setText(message, 'Загрузка базы заданий…');
-          else if (/^已读取\s+\d+\s+个有效题组。$/u.test(text)) {
-            const number = text.match(/\d+/u)?.[0] ?? '';
-            setText(message, `Загружено групп: ${number}.`);
-          } else if (text.startsWith('题库读取失败：')) setText(message, `Не удалось загрузить базу: ${text.slice('题库读取失败：'.length)}`);
-          else if (text === '请至少勾选“官方”或“非官方”中的一种来源。') setText(message, 'Выберите хотя бы один источник: официальный или неофициальный.');
-          else if (text === '请至少勾选一个题组。') setText(message, 'Выберите хотя бы одну группу.');
-          else if (text === '请输入可用范围内的正整数题组数量。') setText(message, 'Введите допустимое количество групп.');
-          else if (text === '正在创建练习……') setText(message, 'Создаём тренировку…');
-          else if (text === '来源筛选已更新，请选择题型或开始练习。') setText(message, 'Фильтр источников обновлён. Выберите тип задания или начните тренировку.');
-          else if (text === '作答记录已重置。') setText(message, 'Результаты сброшены.');
+          if (/^已读取\s+\d+\s+个有效题组。$/u.test(text) || /^Загружено групп:\s*\d+\.$/u.test(text)) {
+            message.hidden = true;
+          } else {
+            message.hidden = false;
+            if (text === '正在读取题库……') setText(message, 'Загрузка базы заданий…');
+            else if (text.startsWith('题库读取失败：')) setText(message, `Не удалось загрузить базу: ${text.slice('题库读取失败：'.length)}`);
+            else if (text === '请至少勾选“官方”或“非官方”中的一种来源。') setText(message, 'Выберите хотя бы один источник: официальный или неофициальный.');
+            else if (text === '请至少勾选一个题组。') setText(message, 'Выберите хотя бы одну группу.');
+            else if (text === '请输入可用范围内的正整数题组数量。') setText(message, 'Введите допустимое количество групп.');
+            else if (text === '正在创建练习……') setText(message, 'Создаём тренировку…');
+            else if (text === '来源筛选已更新，请选择题型或开始练习。') setText(message, 'Фильтр источников обновлён. Выберите тип задания или начните тренировку.');
+            else if (text === '作答记录已重置。') setText(message, 'Результаты сброшены.');
+          }
         }
       }
 
