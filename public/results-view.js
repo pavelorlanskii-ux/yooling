@@ -18,9 +18,8 @@ function translateResultsMessage(text) {
     .replace('详细结果按题组列出，汇总位于页面末尾。', 'Detailed results are listed by group. The summary is at the bottom of the page.')
     .replace('已放弃当前题组；它未计入本次结果。详细结果如下。', 'The current group was abandoned and was not included in the results. Detailed results are below.')
     .replace('正在自动保存报告……', 'Saving report automatically…')
-    .replace('报告已自动保存到：', 'Report saved automatically to: ')
-    .replace('自动保存报告失败：', 'Failed to save report automatically: ')
-    .replace('。请确认本地服务仍在运行且“练题报告”文件夹可写。', '. Make sure the local service is still running and the report folder is writable.');
+    .replace(/报告已自动保存到：.*$/u, 'Report saved automatically.')
+    .replace(/自动保存报告失败：.*$/u, 'Failed to save report automatically.');
 }
 
 function observeResultsMessage(document) {
@@ -68,14 +67,6 @@ function appendChoiceItem(document, article, item, heading) {
   article.append(itemSection);
 }
 
-function appendListeningMetadata(document, article, group) {
-  article.append(
-    node(document, 'h4', { text: 'Listening material' }),
-    line(document, 'Audio file', group.audio),
-    line(document, 'Material type', group.materialKind ?? 'response'),
-  );
-}
-
 function appendGroupBody(document, article, detail) {
   const { group } = detail;
   article.append(node(document, 'h4', { text: 'Instructions' }), node(document, 'p', { className: 'preserve-lines', text: group.instruction }));
@@ -100,10 +91,8 @@ function appendGroupBody(document, article, detail) {
       article.append(itemSection);
     }
   } else if (group.type === 'listen_and_response') {
-    appendListeningMetadata(document, article, group);
     appendChoiceItem(document, article, detail.items[0], `Question: ${group.instruction}`);
   } else if (group.type === 'listen_and_answer') {
-    appendListeningMetadata(document, article, group);
     for (const item of detail.items) appendChoiceItem(document, article, item, `${item.question.id}: ${item.question.prompt}`);
   } else if (group.type === 'build_sentence') {
     article.append(node(document, 'h4', { text: 'Original dialogue and material' }));
@@ -139,10 +128,7 @@ export function renderResults(document, detailsRoot, summaryRoot, result) {
   detailsRoot.replaceChildren();
   result.details.forEach((detail, index) => {
     const article = node(document, 'article', { className: 'result-group' });
-    article.append(
-      node(document, 'h2', { text: `Group ${index + 1}: ${detail.group.title || detail.group.id}` }),
-      line(document, 'Source', detail.group.source),
-    );
+    article.append(node(document, 'h2', { text: `Group ${index + 1}: ${detail.group.title || detail.group.id}` }));
     appendGroupBody(document, article, detail);
     article.append(line(document, 'Time', durationLabel(detail.durationMs)));
     detailsRoot.append(article);
