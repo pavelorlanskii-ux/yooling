@@ -108,11 +108,11 @@
       <div id="exam-message" class="exam-message" role="status" aria-live="polite"></div>
       <div id="exam-content" class="exam-content"></div>
       <footer id="question-source" class="question-source"></footer>
-      <div id="phrase-confirm-popover" class="phrase-confirm-popover" role="dialog" aria-label="Подтверждение сохранения слова или фразы" hidden>
+      <div id="phrase-confirm-popover" class="phrase-confirm-popover" role="dialog" aria-label="Confirm vocabulary save" hidden>
         <strong id="phrase-confirm-preview"></strong>
         <div class="phrase-confirm-actions">
-          <button id="phrase-confirm-cancel" type="button">Отмена</button>
-          <button id="phrase-confirm-accept" type="button">Сохранить</button>
+          <button id="phrase-confirm-cancel" type="button">Cancel</button>
+          <button id="phrase-confirm-accept" type="button">Save</button>
         </div>
       </div>
       <div id="paused-overlay" class="paused-overlay" hidden>
@@ -123,11 +123,11 @@
   </main>
 
   <main id="results-view" class="management-view results-view" hidden>
-    <p class="eyebrow">Тренировка завершена</p>
-    <h1>Результаты</h1>
+    <p class="eyebrow">Practice session completed</p>
+    <h1>Results</h1>
     <p id="results-message"></p>
-    <section id="result-details" class="result-details" aria-label="Подробные результаты"></section>
-      <section id="result-summary" class="result-summary" aria-label="Итог"></section>
+    <section id="result-details" class="result-details" aria-label="Detailed results"></section>
+      <section id="result-summary" class="result-summary" aria-label="Summary"></section>
       <div class="result-actions">
         <button id="report-exception-results" type="button" class="secondary">Report Exception</button>
         <button id="return-home" type="button" class="secondary">К выбору заданий</button>
@@ -161,5 +161,117 @@
   </dialog>
 
   <script type="module" src="/app.js"></script>
+  <script>
+    (() => {
+      const sectionLabels = {
+        Reading: 'Чтение',
+        Writing: 'Письмо',
+        Listening: 'Аудирование',
+      };
+      const sectionDescriptions = {
+        Reading: 'Выберите тип задания для чтения',
+        Writing: 'Выберите тип задания для письма',
+        Listening: 'Выберите тип задания для аудирования',
+      };
+      const typeLabels = {
+        complete_words: 'Дополните слова',
+        read_daily_life: 'Текст из повседневной жизни',
+        read_academic_passage: 'Академический текст',
+        build_sentence: 'Составьте предложение',
+        write_email: 'Напишите письмо',
+        academic_discussion: 'Академическая дискуссия',
+        listen_and_response: 'Выберите ответ',
+        listen_and_answer: 'Ответьте на вопросы',
+      };
+      const chineseTypeLabels = {
+        '补全单词': 'Дополните слова',
+        '日常生活阅读': 'Текст из повседневной жизни',
+        '学术文章阅读': 'Академический текст',
+        '组建句子': 'Составьте предложение',
+        '写电子邮件': 'Напишите письмо',
+        '学术讨论写作': 'Академическая дискуссия',
+        '听句子并选择回应': 'Выберите ответ',
+        '听材料并回答问题': 'Ответьте на вопросы',
+      };
+
+      const setText = (element, text) => {
+        if (element && element.textContent !== text) element.textContent = text;
+      };
+
+      function localizeSectionTabs(root) {
+        root?.querySelectorAll('.section-tab').forEach((tab) => {
+          const english = tab.dataset.section || tab.querySelector('span')?.textContent?.trim();
+          if (sectionLabels[english]) setText(tab.querySelector('strong'), sectionLabels[english]);
+        });
+      }
+
+      function localizeCatalog() {
+        const root = document.getElementById('catalog-view');
+        if (!root) return;
+        localizeSectionTabs(root);
+
+        const selectedSection = root.querySelector('.section-tab.selected')?.dataset.section
+          || root.querySelector('#selected-section-heading span')?.textContent?.trim();
+        if (sectionDescriptions[selectedSection]) {
+          setText(root.querySelector('#selected-section-heading h2'), sectionDescriptions[selectedSection]);
+        }
+
+        root.querySelectorAll('.task-card[data-question-type]').forEach((card) => {
+          const type = card.dataset.questionType;
+          if (typeLabels[type]) setText(card.querySelector('strong'), typeLabels[type]);
+          const count = card.querySelector('.task-card-count');
+          const match = count?.textContent?.match(/^有效\s+(\d+)\s+·\s+未完成\s+(\d+)$/u);
+          if (match) setText(count, `Доступно ${match[1]} · Не выполнено ${match[2]}`);
+        });
+
+        const selectedCount = root.querySelector('#custom-selection-count');
+        const countMatch = selectedCount?.textContent?.match(/^已选择\s+(\d+)\s+组$/u);
+        if (countMatch) setText(selectedCount, `Выбрано: ${countMatch[1]}`);
+
+        root.querySelectorAll('.custom-group-empty').forEach((item) => {
+          if (item.textContent === '请先在上方选择一种具体题型。') setText(item, 'Сначала выберите тип задания выше.');
+          if (item.textContent === '当前来源筛选下没有可选题组。') setText(item, 'По выбранным источникам нет доступных групп.');
+        });
+
+        const message = root.querySelector('#catalog-message');
+        if (message) {
+          const text = message.textContent;
+          if (text === '正在读取题库……') setText(message, 'Загрузка базы заданий…');
+          else if (/^已读取\s+\d+\s+个有效题组。$/u.test(text)) {
+            const number = text.match(/\d+/u)?.[0] ?? '';
+            setText(message, `Загружено групп: ${number}.`);
+          } else if (text.startsWith('题库读取失败：')) setText(message, `Не удалось загрузить базу: ${text.slice('题库读取失败：'.length)}`);
+          else if (text === '请至少勾选“官方”或“非官方”中的一种来源。') setText(message, 'Выберите хотя бы один источник: официальный или неофициальный.');
+          else if (text === '请至少勾选一个题组。') setText(message, 'Выберите хотя бы одну группу.');
+          else if (text === '请输入可用范围内的正整数题组数量。') setText(message, 'Введите допустимое количество групп.');
+          else if (text === '正在创建练习……') setText(message, 'Создаём тренировку…');
+          else if (text === '来源筛选已更新，请选择题型或开始练习。') setText(message, 'Фильтр источников обновлён. Выберите тип задания или начните тренировку.');
+          else if (text === '作答记录已重置。') setText(message, 'Результаты сброшены.');
+        }
+      }
+
+      function localizeHistory() {
+        const root = document.getElementById('history-view');
+        if (!root) return;
+        localizeSectionTabs(root);
+        root.querySelectorAll('.history-tab').forEach((tab) => {
+          let text = tab.textContent;
+          for (const [chinese, russian] of Object.entries(chineseTypeLabels)) {
+            if (text.startsWith(chinese)) text = text.replace(chinese, russian);
+          }
+          setText(tab, text);
+        });
+      }
+
+      const localize = () => {
+        localizeCatalog();
+        localizeHistory();
+      };
+
+      const observer = new MutationObserver(localize);
+      observer.observe(document.body, { childList: true, subtree: true, characterData: true });
+      localize();
+    })();
+  </script>
 </body>
 </html>
